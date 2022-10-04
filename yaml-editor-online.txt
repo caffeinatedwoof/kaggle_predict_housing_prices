@@ -1,0 +1,13 @@
+#INITIAL SETTINGS
+data_directory: ../datasets/
+data_name: train.csv
+index_col: ["Id"]
+target_name: ["SalePrice"]
+test_size: 0.2
+model_directory: ../models/
+model_name: 
+- Linear Regression.pkl, XGB Regressor.pkl
+params:
+  xgb:
+    subsample=0.1, min_child_weight=4, max_depth=4, learning_rate=0.07, gamma=0.3, colsample_bytree=1.0
+    
