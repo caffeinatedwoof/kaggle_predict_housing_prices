@@ -33,9 +33,6 @@ def preprocess(train):
 
     '''
     
-    #Convert YearBuilt to age
-    train['age'] = 2010 - train['YearBuilt']
-    
     #remove row with missing value in 'Electrical'
     train = train.drop([train[train['Electrical'].isnull()].index.values.astype(int)[0]])
     #remove other columns with missing data
@@ -62,11 +59,29 @@ def preprocess(train):
         
     train['Neighborhood'] = train['Neighborhood'].apply(lambda x: neighborhoods[x]) 
     
+    #Adding Age, Remodelled and IsNew
+    train['Age'] = train['YrSold'] - train['YearRemodAdd']
+    train['Remodelled'] = train.apply(lambda x: 0 if 
+                                      (x['YearBuilt'] == x['YearRemodAdd']) 
+                                      else 1, axis=1)
+    train['IsNew'] = train.apply(lambda x: 1 
+                                 if (x['YrSold'] == x['YearBuilt']) else 0, axis=1)
+    
+    #Converting non-numeric predictors to cateogrical variables
+    train['YrSold'] = pd.Categorical(train['YrSold'], ordered=True)
+    train['MoSold'] = pd.Categorical(train['MoSold'], ordered=False)
+    train['OverallQual'] = pd.Categorical(train['OverallQual'], ordered=True)
+    train['Neighborhood'] = pd.Categorical(train['Neighborhood'], ordered=True)
+    
     #Using Robust Scaling
-    X = train[['Neighborhood','OverallQual','age', 'TotalSF']]
+    X = train[['Age', 'TotalSF']]
     transformer = RobustScaler().fit(X)
-    X[['Neighborhood','OverallQual','age', 'TotalSF']] = transformer.transform(X)
-    X = pd.concat((X, train[['SaleCondition']]), axis=1)
+    X[['age', 'TotalSF']] = transformer.transform(X)
+    X = pd.concat((X, train[['SaleCondition','Neighborhood','OverallQual','Age', 
+                             'TotalSF', 'Age', 'Remodelled', 'IsNew', 'YrSold', 
+                             'MoSold']]), 
+                  axis=1)
+
     
     #Creating dummy columns using one-hot encoding
     def create_dummies(df,column_name):
