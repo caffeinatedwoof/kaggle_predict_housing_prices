@@ -43,6 +43,9 @@ def preprocess(train):
     #remove outlier
     train = train.drop([1299], axis=0)
 
+    #combine TotalBsmtSF & GrLivArea
+    train['TotalSF'] = train['GrLivArea'] + train['TotalBsmtSF']
+    
     #binning neighborhoods
     all_nbhds = list(train['Neighborhood'].unique())
     neighborhoods = {}
@@ -60,9 +63,9 @@ def preprocess(train):
     train['Neighborhood'] = train['Neighborhood'].apply(lambda x: neighborhoods[x]) 
     
     #Using Robust Scaling
-    X = train[['Neighborhood','OverallQual','age', 'GrLivArea', 'TotalBsmtSF']]
+    X = train[['Neighborhood','OverallQual','age', 'TotalSF']]
     transformer = RobustScaler().fit(X)
-    X[['Neighborhood','OverallQual','age', 'GrLivArea', 'TotalBsmtSF']] = transformer.transform(X)
+    X[['Neighborhood','OverallQual','age', 'TotalSF']] = transformer.transform(X)
     X = pd.concat((X, train[['SaleCondition']]), axis=1)
     
     #Creating dummy columns using one-hot encoding
@@ -84,7 +87,7 @@ def preprocess(train):
     return X_train, X_test, y_train, y_test
 
 def main():
-    preprocess()
+    preprocess(train)
 
 if __name__ == '__main__':
     main()
