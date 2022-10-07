@@ -68,6 +68,7 @@ def preprocess(train):
                                  if (x['YrSold'] == x['YearBuilt']) else 0, axis=1)
     
     #Converting non-numeric predictors to cateogrical variables
+    train['MSSubClass'] = pd.Categorical(train['MSSubClass'], ordered=False)
     train['YrSold'] = pd.Categorical(train['YrSold'], ordered=True)
     train['MoSold'] = pd.Categorical(train['MoSold'], ordered=False)
     train['OverallQual'] = pd.Categorical(train['OverallQual'], ordered=True)
@@ -77,7 +78,8 @@ def preprocess(train):
     X = train[['Age', 'TotalSF']]
     transformer = RobustScaler().fit(X)
     X[['age', 'TotalSF']] = transformer.transform(X)
-    X = pd.concat((X, train[['SaleCondition','Neighborhood','OverallQual','Age', 
+    X = pd.concat((X, train[['MSSubClass','SaleCondition','Neighborhood',
+                             'OverallQual','Age', 
                              'TotalSF', 'Age', 'Remodelled', 'IsNew', 'YrSold', 
                              'MoSold']]), 
                   axis=1)
