@@ -43,6 +43,10 @@ def preprocess(train):
     #combine TotalBsmtSF & GrLivArea
     train['TotalSF'] = train['GrLivArea'] + train['TotalBsmtSF']
     
+    #combine bathroom variables together
+    train['TotalBath'] = train['BsmtFullBath'] + \
+    0.5*train['BsmtHalfBath'] + train['FullBath'] + 0.5*train['HalfBath']
+    
     #binning neighborhoods
     all_nbhds = list(train['Neighborhood'].unique())
     neighborhoods = {}
@@ -64,8 +68,9 @@ def preprocess(train):
     train['Remodelled'] = train.apply(lambda x: 0 if 
                                       (x['YearBuilt'] == x['YearRemodAdd']) 
                                       else 1, axis=1)
-    train['IsNew'] = train.apply(lambda x: 1 
-                                 if (x['YrSold'] == x['YearBuilt']) else 0, axis=1)
+    train['IsNew'] = train.apply(lambda x: 
+                                 1 if (x['YrSold'] == x['YearBuilt']) else 0, 
+                                 axis=1)
     
     #Converting non-numeric predictors to cateogrical variables
     train['MSSubClass'] = pd.Categorical(train['MSSubClass'], ordered=False)
@@ -73,15 +78,15 @@ def preprocess(train):
     train['MoSold'] = pd.Categorical(train['MoSold'], ordered=False)
     train['OverallQual'] = pd.Categorical(train['OverallQual'], ordered=True)
     train['Neighborhood'] = pd.Categorical(train['Neighborhood'], ordered=True)
+    train['OverallCond'] = pd.Categorical(train['OverallCond'], ordered=True)
     
     #Using Robust Scaling
-    X = train[['Age', 'TotalSF']]
+    X = train[['Age', 'TotalSF', 'TotalBath']]
     transformer = RobustScaler().fit(X)
-    X[['age', 'TotalSF']] = transformer.transform(X)
+    X[['Age', 'TotalSF', 'TotalBath']] = transformer.transform(X)
     X = pd.concat((X, train[['MSSubClass','SaleCondition','Neighborhood',
-                             'OverallQual','Age', 
-                             'TotalSF', 'Age', 'Remodelled', 'IsNew', 'YrSold', 
-                             'MoSold']]), 
+                             'OverallQual','Remodelled', 'IsNew', 'YrSold', 
+                             'MoSold', 'OverallCond']]), 
                   axis=1)
 
     
