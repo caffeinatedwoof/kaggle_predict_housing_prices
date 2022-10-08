@@ -81,9 +81,9 @@ def preprocess(train):
     train['OverallCond'] = pd.Categorical(train['OverallCond'], ordered=True)
     
     #Using Robust Scaling
-    X = train[['Age', 'TotalSF', 'TotalBath']]
+    X = train[['GarageCars','Age', 'TotalSF', 'TotalBath', 'WoodDeckSF', 'OpenPorchSF']]
     transformer = RobustScaler().fit(X)
-    X[['Age', 'TotalSF', 'TotalBath']] = transformer.transform(X)
+    X[['GarageCars','Age', 'TotalSF', 'TotalBath', 'WoodDeckSF', 'OpenPorchSF']] = transformer.transform(X)
     X = pd.concat((X, train[['MSSubClass','SaleCondition','Neighborhood',
                              'OverallQual','Remodelled', 'IsNew', 'YrSold', 
                              'MoSold', 'OverallCond']]), 
